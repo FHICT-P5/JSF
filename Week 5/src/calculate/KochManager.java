@@ -12,6 +12,7 @@ import jsf31kochfractalfx.KochObserver;
 import timeutil.*;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javafx.application.Platform;
 
 /**
  *
@@ -22,8 +23,11 @@ public class KochManager implements Observer{
     private JSF31KochFractalFX application;
     private KochFractal koch;
     
-    private CopyOnWriteArrayList<Edge> edges;
-    private ArrayList<KochRunnable> threads;
+    private ArrayList<Edge> edges;
+    
+    Thread thread1;
+    Thread thread2;
+    Thread thread3;
     
     public int threadCount;
     
@@ -34,16 +38,14 @@ public class KochManager implements Observer{
         koch.addObserver(new KochObserver());
         koch.addObserver(this);
         
-        threads = new ArrayList();
+        edges = new ArrayList();
+        
         threadCount = 0;
         
-        for(int i = 1; i <= 3; i++)
-        {
-            threads.add(new KochRunnable(i, koch, this));
-        }
-        
-        edges = new CopyOnWriteArrayList();
-             
+        thread1 = new Thread(new KochRunnable(1, koch, this));
+        thread2 = new Thread(new KochRunnable(2, koch, this));
+        thread3 = new Thread(new KochRunnable(3, koch, this));
+
     }
     
     @Override
@@ -55,10 +57,14 @@ public class KochManager implements Observer{
     
     public void changeLevel(int nxt) {
         koch.setLevel(nxt);
+        edges.clear();
         
         TimeStamp ts = new TimeStamp();
         ts.setBegin("Start changeLevel");
         
+        Platform.runLater(thread1);
+        Platform.runLater(thread2);
+        Platform.runLater(thread3);
         
         //koch.generateLeftEdge();
         //koch.generateBottomEdge();
@@ -66,32 +72,21 @@ public class KochManager implements Observer{
         
         synchronized(this)
         {
-            for(int i = 0; i < threads.size(); i++)
+            if(threadCount == 3)
             {
-                //k.run();
-                while (threadCount < i)
-                {
-                    
-                }
-                new Thread(threads.get(i)).start();
-                
-            }
-            while(threadCount != 3)
-            {
-                System.out.println(threadCount);
-            }
-            
-            application.requestDrawEdges();
-            threadCount = 0;
+                application.requestDrawEdges();
+                threadCount = 0;
+            }            
+        
+        
+            ts.setEnd("Einde changeLevel");
+        
+            application.setTextNrEdges(String.valueOf(koch.getNrOfEdges()));
+            application.setTextCalc(ts.toString());
+        
+        
+            drawEdges();
         }
-        
-        ts.setEnd("Einde changeLevel");
-        
-        application.setTextNrEdges(String.valueOf(koch.getNrOfEdges()));
-        application.setTextCalc(ts.toString());
-        
-        drawEdges();
-        edges = new CopyOnWriteArrayList();
     }
     
     public void drawEdges() {
