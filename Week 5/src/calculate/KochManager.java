@@ -40,7 +40,7 @@ public class KochManager implements Observer{
         
         edges = new ArrayList();
         
-        threadCount = 0;
+        threadCount = 3;
         
         thread1 = new Thread(new KochRunnable(1, koch, this));
         thread2 = new Thread(new KochRunnable(2, koch, this));
@@ -72,6 +72,7 @@ public class KochManager implements Observer{
         
         synchronized(this)
         {
+            System.out.println(threadCount);
             if(threadCount == 3)
             {
                 application.requestDrawEdges();
@@ -83,8 +84,7 @@ public class KochManager implements Observer{
         
             application.setTextNrEdges(String.valueOf(koch.getNrOfEdges()));
             application.setTextCalc(ts.toString());
-        
-        
+
             drawEdges();
         }
     }
