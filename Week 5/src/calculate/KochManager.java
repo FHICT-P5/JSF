@@ -25,14 +25,16 @@ public class KochManager implements Observer{
     
     private ArrayList<Edge> edges;
     
-    Thread thread1;
-    Thread thread2;
-    Thread thread3;
+    //Thread thread1;
+    //Thread thread2;
+    //Thread thread3;
     
     public int threadCount;
     
     public KochManager(JSF31KochFractalFX application){
         this.application = application;
+        
+        threadCount = 3;
         
         koch = new KochFractal();
         koch.addObserver(new KochObserver());
@@ -40,11 +42,9 @@ public class KochManager implements Observer{
         
         edges = new ArrayList();
         
-        threadCount = 3;
-        
-        thread1 = new Thread(new KochRunnable(1, koch, this));
-        thread2 = new Thread(new KochRunnable(2, koch, this));
-        thread3 = new Thread(new KochRunnable(3, koch, this));
+        //thread1 = new Thread(new KochRunnable(1, koch, this));
+        //thread2 = new Thread(new KochRunnable(2, koch, this));
+        //thread3 = new Thread(new KochRunnable(3, koch, this));
 
     }
     
@@ -56,11 +56,20 @@ public class KochManager implements Observer{
     }
     
     public void changeLevel(int nxt) {
+        TimeStamp tsTotal = new TimeStamp();
+        tsTotal.setBegin("Start total");
+        
         koch.setLevel(nxt);
         edges.clear();
         
         TimeStamp ts = new TimeStamp();
         ts.setBegin("Start changeLevel");
+        
+        Thread thread1 = new Thread(new KochRunnable(1, koch, this));
+        Thread thread2 = new Thread(new KochRunnable(2, koch, this));
+        Thread thread3 = new Thread(new KochRunnable(3, koch, this));
+        
+        thread1.setName("T1");
         
         Platform.runLater(thread1);
         Platform.runLater(thread2);
@@ -72,7 +81,6 @@ public class KochManager implements Observer{
         
         synchronized(this)
         {
-            System.out.println(threadCount);
             if(threadCount == 3)
             {
                 application.requestDrawEdges();
@@ -86,6 +94,9 @@ public class KochManager implements Observer{
             application.setTextCalc(ts.toString());
 
             drawEdges();
+            
+            tsTotal.setEnd("Einde total");
+            application.setTextCalc(tsTotal.toString());
         }
     }
     
@@ -102,6 +113,5 @@ public class KochManager implements Observer{
         
         ts.setEnd("Einde drawEdges");
         application.setTextDraw(ts.toString());
-        
     }
 }
