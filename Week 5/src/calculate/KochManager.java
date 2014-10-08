@@ -21,7 +21,6 @@ import javafx.application.Platform;
 public class KochManager implements Observer{
     
     private JSF31KochFractalFX application;
-    private KochFractal koch;
     
     private ArrayList<Edge> edges;
     
@@ -34,17 +33,9 @@ public class KochManager implements Observer{
     public KochManager(JSF31KochFractalFX application){
         this.application = application;
         
-        threadCount = 3;
-        
-        koch = new KochFractal();
-        koch.addObserver(new KochObserver());
-        koch.addObserver(this);
+        threadCount = 0;
         
         edges = new ArrayList();
-        
-        //thread1 = new Thread(new KochRunnable(1, koch, this));
-        //thread2 = new Thread(new KochRunnable(2, koch, this));
-        //thread3 = new Thread(new KochRunnable(3, koch, this));
 
     }
     
@@ -59,45 +50,47 @@ public class KochManager implements Observer{
         TimeStamp tsTotal = new TimeStamp();
         tsTotal.setBegin("Start total");
         
-        koch.setLevel(nxt);
         edges.clear();
         
         TimeStamp ts = new TimeStamp();
         ts.setBegin("Start changeLevel");
         
-        Thread thread1 = new Thread(new KochRunnable(1, koch, this));
-        Thread thread2 = new Thread(new KochRunnable(2, koch, this));
-        Thread thread3 = new Thread(new KochRunnable(3, koch, this));
+        KochRunnable koch1 = new KochRunnable(1, nxt, this);
+        KochRunnable koch2 = new KochRunnable(2, nxt, this);
+        KochRunnable koch3 = new KochRunnable(3, nxt, this);
+        
+        Thread thread1 = new Thread(koch1);
+        Thread thread2 = new Thread(koch2);
+        Thread thread3 = new Thread(koch3);
         
         thread1.setName("T1");
         
-        Platform.runLater(thread1);
-        Platform.runLater(thread2);
-        Platform.runLater(thread3);
-        
-        //koch.generateLeftEdge();
-        //koch.generateBottomEdge();
-        //koch.generateRightEdge();
-        
-        synchronized(this)
-        {
-            if(threadCount == 3)
-            {
-                application.requestDrawEdges();
-                threadCount = 0;
-            }            
-        
-        
-            ts.setEnd("Einde changeLevel");
-        
-            application.setTextNrEdges(String.valueOf(koch.getNrOfEdges()));
-            application.setTextCalc(ts.toString());
+        thread1.start();
+        thread2.start();
+        thread3.start();
 
-            drawEdges();
+        application.setTextNrEdges(String.valueOf(koch1.getKochFractal().getNrOfEdges()));
+        
+        ts.setEnd("Einde changeLevel");     
+        application.setTextCalc(ts.toString());
             
-            tsTotal.setEnd("Einde total");
-            application.setTextCalc(tsTotal.toString());
+        tsTotal.setEnd("Einde total");
+        application.setTextCalc(tsTotal.toString());
+
+        
+    }
+    
+    public synchronized void increaseCount(){
+        threadCount++;
+        if(threadCount == 3)
+        {
+            application.requestDrawEdges();
+            threadCount = 0;
         }
+    }
+    
+    public synchronized void addEdge(Edge e){
+        edges.add(e);
     }
     
     public void drawEdges() {

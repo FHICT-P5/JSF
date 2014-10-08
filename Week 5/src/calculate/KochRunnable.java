@@ -5,22 +5,28 @@
  */
 package calculate;
 
+import java.util.Observable;
+import java.util.Observer;
+
 
 /**
  *
  * @author jsf3
  */
-public class KochRunnable implements Runnable{
+public class KochRunnable implements Runnable, Observer{
     
     private int id;
     private KochFractal koch;
     private KochManager man;
     
-    public KochRunnable(int id, KochFractal koch, KochManager man)
+    public KochRunnable(int id, int level, KochManager man)
     {
         this.id = id;
-        this.koch = koch;
+        this.koch = new KochFractal();
         this.man = man;
+        
+        koch.addObserver(this);
+        koch.setLevel(level);
     }
     
     public int getId()
@@ -43,11 +49,20 @@ public class KochRunnable implements Runnable{
                 koch.generateBottomEdge();
                 break;
         }
+        man.increaseCount();
         
-        man.threadCount++;
 
     }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        man.addEdge((Edge)arg);
+    }
     
+    public KochFractal getKochFractal()
+    {
+        return koch;
+    }    
 }
 
 
