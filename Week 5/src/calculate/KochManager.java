@@ -10,6 +10,10 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import javafx.application.Platform;
 import jsf31kochfractalfx.JSF31KochFractalFX;
 import jsf31kochfractalfx.KochObserver;
@@ -19,33 +23,21 @@ import timeutil.*;
  *
  * @author jsf3
  */
-public class KochManager implements Observer{
+public class KochManager{
     
     private JSF31KochFractalFX application;
     
     private ArrayList<Edge> edges;
+    private ExecutorService pool;
     private CyclicBarrier barrier;
     
-    //Thread thread1;
-    //Thread thread2;
-    //Thread thread3;
-    
-    public int threadCount;
     
     public KochManager(JSF31KochFractalFX application){
         this.application = application;
         
-        threadCount = 0;
-        
         edges = new ArrayList();
-
-    }
-    
-    @Override
-    public void update (Observable o, Object arg) {
-        //application.drawEdge((Edge)arg);
-        
-        edges.add((Edge)arg);
+        pool = Executors.newFixedThreadPool(3);
+        barrier = new CyclicBarrier(3);
     }
     
     public void changeLevel(int nxt) {
@@ -57,23 +49,28 @@ public class KochManager implements Observer{
         TimeStamp ts = new TimeStamp();
         ts.setBegin("Start changeLevel");
         
-        KochRunnable koch1 = new KochRunnable(1, nxt, this);
-        KochRunnable koch2 = new KochRunnable(2, nxt, this);
-        KochRunnable koch3 = new KochRunnable(3, nxt, this);
+        KochCallable koch1 = new KochCallable(1, this.barrier);
+        KochCallable koch2 = new KochCallable(2, this.barrier);
+        KochCallable koch3 = new KochCallable(3, this.barrier);
         
-        Thread thread1 = new Thread(koch1);
-        Thread thread2 = new Thread(koch2);
-        Thread thread3 = new Thread(koch3);
-        
-        thread1.setName("T1");
-        thread2.setName("T2");
-        thread3.setName("T3");
-        
-        thread1.start();
-        thread2.start();
-        thread3.start();
+        Future<ArrayList<Edge>> fut1 = pool.submit(koch1);
+        Future<ArrayList<Edge>> fut2 = pool.submit(koch2);
+        Future<ArrayList<Edge>> fut3 = pool.submit(koch3);
 
-        application.setTextNrEdges(String.valueOf(koch1.getKochFractal().getNrOfEdges()));
+        try
+        {
+            edges.addAll(fut1.get());
+        }
+        catch(InterruptedException e1)
+        {
+            System.out.println("I was interrupted");
+        }
+        catch(ExecutionException e2)
+        {
+            System.out.println("Excecution went wrong");
+        }
+
+        //application.setTextNrEdges(String.valueOf(koch1.getKochFractal().getNrOfEdges()));
         
         ts.setEnd("Einde changeLevel");     
         application.setTextCalc(ts.toString());
@@ -82,15 +79,6 @@ public class KochManager implements Observer{
         application.setTextCalc(tsTotal.toString());
 
         
-    }
-    
-    public synchronized void increaseCount(){
-        threadCount++;
-        if(threadCount == 3)
-        {
-            application.requestDrawEdges();
-            threadCount = 0;
-        }
     }
     
     public synchronized void addEdge(Edge e){

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
 
 /**
  *
@@ -17,12 +18,17 @@ import java.util.concurrent.Callable;
  */
 public class KochCallable implements Callable, Observer
 {
+    private int id;
+    
     private ArrayList<Edge> edges;
     private KochFractal koch;
+    private CyclicBarrier barrier;
     
-    public KochCallable()
+    public KochCallable(int id, CyclicBarrier cb)
     {
+        this.id = id;
         this.koch = new KochFractal();
+        this.barrier = cb;
         
         edges = new ArrayList();
         koch.addObserver(this);
@@ -31,13 +37,26 @@ public class KochCallable implements Callable, Observer
     @Override
     public Object call() throws Exception
     {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        switch(id)
+        {
+            case 1:
+                koch.generateLeftEdge();
+                break;
+            case 2:
+                koch.generateRightEdge();
+                break;
+            case 3:
+                koch.generateBottomEdge();
+                break;
+        }
+        barrier.await();
+        return edges;
     }
 
     @Override
     public void update(Observable o, Object o1)
     {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        edges.add((Edge)o1);
     }
     
 }
