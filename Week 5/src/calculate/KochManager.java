@@ -5,14 +5,15 @@
  */
 package calculate;
 
-import java.util.Observer;
+import java.util.ArrayList;
 import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CyclicBarrier;
+import javafx.application.Platform;
 import jsf31kochfractalfx.JSF31KochFractalFX;
 import jsf31kochfractalfx.KochObserver;
 import timeutil.*;
-import java.util.ArrayList;
-import java.util.concurrent.CopyOnWriteArrayList;
-import javafx.application.Platform;
 
 /**
  *
@@ -23,6 +24,7 @@ public class KochManager implements Observer{
     private JSF31KochFractalFX application;
     
     private ArrayList<Edge> edges;
+    private CyclicBarrier barrier;
     
     //Thread thread1;
     //Thread thread2;
@@ -64,6 +66,8 @@ public class KochManager implements Observer{
         Thread thread3 = new Thread(koch3);
         
         thread1.setName("T1");
+        thread2.setName("T2");
+        thread3.setName("T3");
         
         thread1.start();
         thread2.start();
