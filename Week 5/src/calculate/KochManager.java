@@ -31,6 +31,16 @@ public class KochManager{
     private ExecutorService pool;
     private CyclicBarrier barrier;
     
+    private KochCallable koch1;
+    private KochCallable koch2;
+    private KochCallable koch3;
+    
+    Future<ArrayList<Edge>> fut1;
+    Future<ArrayList<Edge>> fut2;
+    Future<ArrayList<Edge>> fut3;
+    
+    private boolean calculationsDone;
+    
     
     public KochManager(JSF31KochFractalFX application){
         this.application = application;
@@ -44,35 +54,24 @@ public class KochManager{
         TimeStamp tsTotal = new TimeStamp();
         tsTotal.setBegin("Start total");
         
+        calculationsDone = false;
+        
         edges.clear();
         
         TimeStamp ts = new TimeStamp();
         ts.setBegin("Start changeLevel");
         
-        KochCallable koch1 = new KochCallable(1, nxt, this.barrier);
-        KochCallable koch2 = new KochCallable(2, nxt, this.barrier);
-        KochCallable koch3 = new KochCallable(3, nxt, this.barrier);
+        koch1 = new KochCallable(1, nxt, this.barrier, this);
+        koch2 = new KochCallable(2, nxt, this.barrier, this);
+        koch3 = new KochCallable(3, nxt, this.barrier, this);
         
-        Future<ArrayList<Edge>> fut1 = pool.submit(koch1);
-        Future<ArrayList<Edge>> fut2 = pool.submit(koch2);
-        Future<ArrayList<Edge>> fut3 = pool.submit(koch3);
+        fut1 = pool.submit(koch1);
+        fut2 = pool.submit(koch2);
+        fut3 = pool.submit(koch3);
 
-        try
-        {
-            edges.addAll(fut1.get());
-            edges.addAll(fut2.get());
-            edges.addAll(fut3.get());
-        }
-        catch(InterruptedException e1)
-        {
-            System.out.println("I was interrupted");
-        }
-        catch(ExecutionException e2)
-        {
-            System.out.println("Excecution went wrong");
-        }
+        
 
-        application.requestDrawEdges();
+        
         application.setTextNrEdges(String.valueOf(koch1.getKochFractal().getNrOfEdges()));
         
         ts.setEnd("Einde changeLevel");     
@@ -94,6 +93,20 @@ public class KochManager{
         
         application.clearKochPanel();
         
+        try
+        {
+            edges.addAll(fut1.get());
+            edges.addAll(fut2.get());
+            edges.addAll(fut3.get());
+        }
+        catch(InterruptedException e1)
+        {
+            System.out.println("I was interrupted");
+        }
+        catch(ExecutionException e2)
+        {
+            System.out.println("Excecution went wrong");
+        }
         
         for(Edge e : edges){
             application.drawEdge(e);
@@ -101,5 +114,18 @@ public class KochManager{
         
         ts.setEnd("Einde drawEdges");
         application.setTextDraw(ts.toString());
+    }
+    
+    public void readCallables()
+    {
+        //calculationsDone = true;
+        
+        application.requestDrawEdges();
+        
+    }
+    
+    public boolean getDoneReading()
+    {
+        return calculationsDone;
     }
 }

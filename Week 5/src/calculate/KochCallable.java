@@ -23,12 +23,14 @@ public class KochCallable implements Callable, Observer
     private ArrayList<Edge> edges;
     private KochFractal koch;
     private CyclicBarrier barrier;
+    private KochManager manager;
     
-    public KochCallable(int id, int level, CyclicBarrier cb)
+    public KochCallable(int id, int level, CyclicBarrier cb, KochManager manager)
     {
         this.id = id;
         this.koch = new KochFractal();
         this.barrier = cb;
+        this.manager = manager;
         
         edges = new ArrayList();
         koch.addObserver(this);
@@ -51,7 +53,11 @@ public class KochCallable implements Callable, Observer
     @Override
     public Object call() throws Exception
     {
-        barrier.await();
+        if (barrier.await() == 0);
+        {
+            //De laatste thread returns 0
+            manager.readCallables();
+        }
         return edges;
     }
 
