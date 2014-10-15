@@ -49,7 +49,7 @@ public class KochRunnable implements Runnable, Observer{
                 koch.generateBottomEdge();
                 break;
         }
-        man.increaseCount();
+        //man.increaseCount();
         
 
     }

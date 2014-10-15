@@ -49,9 +49,9 @@ public class KochManager{
         TimeStamp ts = new TimeStamp();
         ts.setBegin("Start changeLevel");
         
-        KochCallable koch1 = new KochCallable(1, this.barrier);
-        KochCallable koch2 = new KochCallable(2, this.barrier);
-        KochCallable koch3 = new KochCallable(3, this.barrier);
+        KochCallable koch1 = new KochCallable(1, nxt, this.barrier);
+        KochCallable koch2 = new KochCallable(2, nxt, this.barrier);
+        KochCallable koch3 = new KochCallable(3, nxt, this.barrier);
         
         Future<ArrayList<Edge>> fut1 = pool.submit(koch1);
         Future<ArrayList<Edge>> fut2 = pool.submit(koch2);
@@ -60,6 +60,8 @@ public class KochManager{
         try
         {
             edges.addAll(fut1.get());
+            edges.addAll(fut2.get());
+            edges.addAll(fut3.get());
         }
         catch(InterruptedException e1)
         {
@@ -70,7 +72,8 @@ public class KochManager{
             System.out.println("Excecution went wrong");
         }
 
-        //application.setTextNrEdges(String.valueOf(koch1.getKochFractal().getNrOfEdges()));
+        application.requestDrawEdges();
+        application.setTextNrEdges(String.valueOf(koch1.getKochFractal().getNrOfEdges()));
         
         ts.setEnd("Einde changeLevel");     
         application.setTextCalc(ts.toString());

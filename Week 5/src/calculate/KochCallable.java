@@ -24,7 +24,7 @@ public class KochCallable implements Callable, Observer
     private KochFractal koch;
     private CyclicBarrier barrier;
     
-    public KochCallable(int id, CyclicBarrier cb)
+    public KochCallable(int id, int level, CyclicBarrier cb)
     {
         this.id = id;
         this.koch = new KochFractal();
@@ -32,11 +32,8 @@ public class KochCallable implements Callable, Observer
         
         edges = new ArrayList();
         koch.addObserver(this);
-    }
-
-    @Override
-    public Object call() throws Exception
-    {
+        koch.setLevel(level);
+        
         switch(id)
         {
             case 1:
@@ -49,6 +46,11 @@ public class KochCallable implements Callable, Observer
                 koch.generateBottomEdge();
                 break;
         }
+    }
+
+    @Override
+    public Object call() throws Exception
+    {
         barrier.await();
         return edges;
     }
@@ -57,6 +59,11 @@ public class KochCallable implements Callable, Observer
     public void update(Observable o, Object o1)
     {
         edges.add((Edge)o1);
+    }
+    
+    public KochFractal getKochFractal()
+    {
+        return this.koch;
     }
     
 }
