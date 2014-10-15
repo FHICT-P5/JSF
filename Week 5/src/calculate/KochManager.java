@@ -37,10 +37,7 @@ public class KochManager{
     
     Future<ArrayList<Edge>> fut1;
     Future<ArrayList<Edge>> fut2;
-    Future<ArrayList<Edge>> fut3;
-    
-    private boolean calculationsDone;
-    
+    Future<ArrayList<Edge>> fut3;   
     
     public KochManager(JSF31KochFractalFX application){
         this.application = application;
@@ -53,8 +50,6 @@ public class KochManager{
     public void changeLevel(int nxt) {
         TimeStamp tsTotal = new TimeStamp();
         tsTotal.setBegin("Start total");
-        
-        calculationsDone = false;
         
         edges.clear();
         
@@ -118,14 +113,7 @@ public class KochManager{
     
     public void readCallables()
     {
-        //calculationsDone = true;
-        
         application.requestDrawEdges();
         
-    }
-    
-    public boolean getDoneReading()
-    {
-        return calculationsDone;
     }
 }
