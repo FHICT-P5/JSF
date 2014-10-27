@@ -43,10 +43,18 @@ public class Monitor
         lock.lock();
         try
         {
-            if(readers.size() > 0)
+            if(readers.size() > 0 && writerCount == 0)
             {
-                readers.get(0).clearInterruptFlag();
-                readers.remove(0);
+                for (BallRunnable b : readers)
+                {
+                    if (b != null)
+                    {
+                        b.waiting = false;
+                        readerCount++;
+                        System.out.println("Entering: READER");
+                    }
+                }
+                readers.clear();
             }
         }
         finally
@@ -60,10 +68,23 @@ public class Monitor
         lock.lock();
         try
         {
-            if(writers.size() > 0)
+            if(writers.size() > 0 && writerCount == 0 && readerCount == 0)
             {
-                writers.get(0).clearInterruptFlag();
-                writers.remove(0);
+                int index = 0;
+                boolean done = false;
+                while (index < writers.size() && done == false)
+                {
+                    BallRunnable b = writers.get(index);
+                    
+                    if (b != null)
+                    {
+                        b.waiting = false;
+                        writerCount++;
+                        System.out.println("Entering: WRITER");
+                        done = true;
+                    }
+                    writers.remove(b);
+                }
             }
         }
         finally
@@ -72,42 +93,47 @@ public class Monitor
         }
     }
     
-    public boolean canIMove(BallRunnable run) throws InterruptedException 
+    public void AtBeginOfCs(BallRunnable run) throws InterruptedException 
     {
         lock.lock();
         try
         {
-            if(run.getBall().getColor() == Color.RED && writerCount == 0)
+            run.waiting = true;
+            if(run.getBall().getColor() == Color.RED)
             {
-                readerCount++;
-                return true;
-            }
-            else if(run.getBall().getColor() == Color.BLUE && writerCount == 0 && readerCount == 0)
-            {
-                writerCount++;
-                return true;
+                readers.add(run);
             }
             else
             {
-                if(run.getBall().getColor() == Color.RED)
-                {
-                    readers.add(run);
-                }
-                else
-                {
-                    //writers.add(run);
-                }
-                throw new InterruptedException();
+                writers.add(run);
             }
+            AllowBall();
+        }
+        finally
+        {
+            
+            lock.unlock();
+        }
+    }
+    
+    private void AllowBall()
+    {
+        lock.lock();
+        
+        try
+        {
+            enterWriter();
+            enterReader();
+        } catch (InterruptedException ex)
+        {
+            Logger.getLogger(Monitor.class.getName()).log(Level.SEVERE, null, ex);
         }
         finally
         {
             lock.unlock();
         }
-            
-        
     }
-    
+          
     public void leave(Color color)
     {
         lock.lock();
@@ -120,6 +146,7 @@ public class Monitor
                 {
                     readerCount = 0;
                 }
+                System.out.println("Leaving: WRITER");
             }
             else if(color == Color.BLUE)
             {
@@ -128,29 +155,10 @@ public class Monitor
                 {
                     writerCount = 0;
                 }
+                System.out.println("Leaving: READER");
             }
 
-            if(writerCount == 0 && readerCount == 0 && writers.size() > 0)
-            {   
-                try
-                {
-                    enterWriter();
-                } catch (InterruptedException ex)
-                {
-                    Logger.getLogger(Monitor.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            else if(writerCount == 0 && readerCount == 0)
-            {
-
-                try
-                {
-                    enterReader();
-                } catch (InterruptedException ex)
-                {
-                    Logger.getLogger(Monitor.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+            AllowBall();
         }
         finally
         {
