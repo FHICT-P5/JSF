@@ -64,9 +64,6 @@ public class KochManager{
         fut2 = pool.submit(koch2);
         fut3 = pool.submit(koch3);
 
-        
-
-        
         application.setTextNrEdges(String.valueOf(koch1.getKochFractal().getNrOfEdges()));
         
         ts.setEnd("Einde changeLevel");     
@@ -74,8 +71,6 @@ public class KochManager{
             
         tsTotal.setEnd("Einde total");
         application.setTextCalc(tsTotal.toString());
-
-        
     }
     
     public synchronized void addEdge(Edge e){
@@ -114,6 +109,5 @@ public class KochManager{
     public void readCallables()
     {
         application.requestDrawEdges();
-        
     }
 }
