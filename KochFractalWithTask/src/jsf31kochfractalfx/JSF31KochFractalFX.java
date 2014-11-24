@@ -123,8 +123,8 @@ public class JSF31KochFractalFX extends Application {
         progressRightNrEdges = new Label();
         
         progressLeft.setText("Progress left:");
-        progressBottom.setText("Progress left:");
-        progressRight.setText("Progress left:");
+        progressBottom.setText("Progress bottom:");
+        progressRight.setText("Progress right:");
         
         progressLeftNrEdges.setText("Nr edges: 0");
         progressBottomNrEdges.setText("Nr edges: 0");
@@ -138,9 +138,9 @@ public class JSF31KochFractalFX extends Application {
         grid.add(progressBar2, 3, 8);
         grid.add(progressBar3, 3, 9);
         
-        grid.add(progressLeftNrEdges, 5, 7);
-        grid.add(progressBottomNrEdges, 5, 8);
-        grid.add(progressRightNrEdges, 5, 9);
+        grid.add(progressLeftNrEdges, 4, 7);
+        grid.add(progressBottomNrEdges, 4, 8);
+        grid.add(progressRightNrEdges, 4, 9);
         
         // Button to increase level of Koch fractal
         Button buttonIncreaseLevel = new Button();
@@ -208,7 +208,7 @@ public class JSF31KochFractalFX extends Application {
         
         // Create the scene and add the grid pane
         Group root = new Group();
-        Scene scene = new Scene(root, kpWidth+50, kpHeight+170);
+        Scene scene = new Scene(root, kpWidth+50, kpHeight+300);
         root.getChildren().add(grid);
         
         // Define title and assign the scene for main window
@@ -356,24 +356,24 @@ public class JSF31KochFractalFX extends Application {
     {
         //KOCHTASK LEFT
         // Initialize the progressbar
-        progressBar1.setProgress(0);
-        progressBar1.progressProperty().bind(ktLeft.progressProperty());
+        progressBar1.setProgress(ktLeft.getProgress());
+        //progressBar1.progressProperty().bind(ktLeft.progressProperty());
 
         // Provides information about count        
         progressLeftNrEdges.textProperty().bind(ktLeft.messageProperty());
         
         //KOCHTASK BOTTOM
         // Initialize the progressbar
-        progressBar2.setProgress(0);
-        progressBar2.progressProperty().bind(ktBottom.progressProperty());
+        progressBar2.setProgress(ktBottom.getProgress());
+        //progressBar2.progressProperty().bind(ktBottom.progressProperty());
 
         // Provides information about count        
         progressBottomNrEdges.textProperty().bind(ktBottom.messageProperty());
         
         //KOCHTASK RIGHT
         // Initialize the progressbar
-        progressBar3.setProgress(0);
-        progressBar3.progressProperty().bind(ktRight.progressProperty());
+        progressBar3.setProgress(ktRight.getProgress());
+        //progressBar3.progressProperty().bind(ktRight.progressProperty());
 
         // Provides information about count        
         progressRightNrEdges.textProperty().bind(ktRight.messageProperty());
