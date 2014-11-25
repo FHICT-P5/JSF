@@ -11,7 +11,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.concurrent.Task;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import jsf31kochfractalfx.JSF31KochFractalFX;
@@ -21,127 +25,130 @@ import timeutil.*;
  *
  * @author jsf3
  */
-public class KochManager{
-    
+public class KochManager {
+
     private JSF31KochFractalFX application;
-    
+
     private ArrayList<Edge> edges;
     private ExecutorService pool;
     private CyclicBarrier barrier;
-    
+
     //private KochCallable koch1;
     //private KochCallable koch2;
     //private KochCallable koch3;
-    
     private KochTask ktLeft;
     private KochTask ktBottom;
     private KochTask ktRight;
-    
+
     private ArrayList<KochTask> KochTasks;
-    
+
     /*
-    Future<ArrayList<Edge>> fut1;
-    Future<ArrayList<Edge>> fut2;
-    Future<ArrayList<Edge>> fut3;   
-    */
-    
-    public KochManager(JSF31KochFractalFX application){
+     Future<ArrayList<Edge>> fut1;
+     Future<ArrayList<Edge>> fut2;
+     Future<ArrayList<Edge>> fut3;   
+     */
+    public KochManager(JSF31KochFractalFX application) {
         this.application = application;
-        
+
         edges = new ArrayList();
         pool = Executors.newFixedThreadPool(3);
         barrier = new CyclicBarrier(3);
-        
+
         KochTasks = new ArrayList();
-        
+
     }
-    
+
     public void changeLevel(int nxt) {
         application.clearKochPanel();
         TimeStamp tsTotal = new TimeStamp();
         tsTotal.setBegin("Start total");
-        
+
         edges.clear();
-        
+
         TimeStamp ts = new TimeStamp();
         ts.setBegin("Start changeLevel");
 
         //application.setTextNrEdges(String.valueOf(koch1.getKochFractal().getNrOfEdges()));
+        ktLeft = new KochTask(1, nxt, this, application);
+        ktBottom = new KochTask(2, nxt, this, application);
+        ktRight = new KochTask(3, nxt, this, application);
+
+        EventHandler doneHandler = new EventHandler() {
+
+            @Override
+            public void handle(Event event) {
+                if (ktLeft.isDone() && ktRight.isDone() && ktBottom.isDone()) {
+                    
+                    ktLeft.setOnSucceeded(null);
+                    ktBottom.setOnSucceeded(null);
+                    ktRight.setOnSucceeded(null);
+                    
+                    try {
+                        edges.addAll(ktLeft.get());
+                        edges.addAll(ktBottom.get());
+                        edges.addAll(ktRight.get());
+                        // draw stuff
+                        
+                        application.requestDrawEdges();
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(KochManager.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        };
         
-        ktLeft = new KochTask(1, nxt, this.barrier, this);
-        ktBottom = new KochTask(2, nxt, this.barrier, this);
-        ktRight = new KochTask(3, nxt, this.barrier, this);
-        
+        ktLeft.setOnSucceeded(doneHandler);
+        ktBottom.setOnSucceeded(doneHandler);
+        ktRight.setOnSucceeded(doneHandler);
+
         try {
-            ktLeft.call();
-            ktBottom.call();
-            ktRight.call();
-        }
-        catch(Exception ex) {
+            pool.submit(ktLeft);
+            pool.submit(ktBottom);
+            pool.submit(ktRight);
+
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        
+
         application.bindKochTaskProperties(ktLeft, ktBottom, ktRight);
+
         
-        ts.setEnd("Einde changeLevel");     
+        
+        ts.setEnd("Einde changeLevel");
         application.setTextCalc(ts.toString());
-            
+
         tsTotal.setEnd("Einde total");
         application.setTextCalc(tsTotal.toString());
+
     }
-    
-    public synchronized void addEdge(Edge e){
+
+    public synchronized void addEdge(Edge e) {
         edges.add(e);
         drawSingleEdge();
     }
-    
-    public synchronized void drawSingleEdge()
-    {
-        application.drawEdge(edges.get(edges.size() - 1));
+
+    public synchronized void drawSingleEdge() {
+        application.drawEdge(edges.get(edges.size() - 1), null);
+        System.out.println("Drawing edge");
     }
-       
+
     public void drawEdges() {
         TimeStamp ts = new TimeStamp();
         ts.setBegin("Start drawEdges");
-        
+
         application.clearKochPanel();
+
         
-        try
-        {
-            /*
-            edges.addAll(fut1.get());
-            edges.addAll(fut2.get());
-            edges.addAll(fut3.get());
-            */
-            
-            ktLeft.call();
-            ktBottom.call();
-            ktRight.call();
+
+        for (Edge e : edges) {
+            application.drawEdge(e, null);
         }
-        catch(InterruptedException e1)
-        {
-            System.out.println("I was interrupted");
-        }
-        catch(ExecutionException e2)
-        {
-            System.out.println("Excecution went wrong");
-        }
-        catch(Exception e3)
-        {
-            System.out.println("ERROR ERROR");
-            System.out.println(e3.getMessage());
-        }
-        
-        for(Edge e : edges){
-            application.drawEdge(e);
-        }
-        
+
         ts.setEnd("Einde drawEdges");
         application.setTextDraw(ts.toString());
     }
-    
-    public void readCallables()
-    {
+
+    public void readCallables() {
         //application.requestDrawEdges();
     }
 }

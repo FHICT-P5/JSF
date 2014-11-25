@@ -69,6 +69,36 @@ public class JSF31KochFractalFX extends Application {
     private final int kpWidth = 500;
     private final int kpHeight = 500;
     
+    public ProgressBar getProgressBar1()
+    {
+        return this.progressBar1;
+    }
+    
+    public ProgressBar getProgressBar2()
+    {
+        return this.progressBar2;
+    }
+    
+    public ProgressBar getProgressBar3()
+    {
+        return this.progressBar3;
+    }
+    
+    public Label getLabel1()
+    {
+        return this.progressLeftNrEdges;
+    }
+    
+    public Label getLabel2()
+    {
+        return this.progressBottomNrEdges;
+    }
+    
+    public Label getLabel3()
+    {
+        return this.progressRightNrEdges;
+    }
+    
     @Override
     public void start(Stage primaryStage) {
        
@@ -114,9 +144,9 @@ public class JSF31KochFractalFX extends Application {
         progressBottom = new Label();
         progressRight = new Label();
         
-        progressBar1 = new ProgressBar();
-        progressBar2 = new ProgressBar();
-        progressBar3 = new ProgressBar();
+        progressBar1 = new ProgressBar(0);
+        progressBar2 = new ProgressBar(0);
+        progressBar3 = new ProgressBar(0);
         
         progressLeftNrEdges = new Label();
         progressBottomNrEdges = new Label();
@@ -224,7 +254,7 @@ public class JSF31KochFractalFX extends Application {
         gc.fillRect(0.0,0.0,kpWidth,kpHeight);
     }
     
-    public void drawEdge(Edge e) {
+    public void drawEdge(Edge e, Color c) {
         // Graphics
         GraphicsContext gc = kochPanel.getGraphicsContext2D();
         
@@ -232,7 +262,14 @@ public class JSF31KochFractalFX extends Application {
         Edge e1 = edgeAfterZoomAndDrag(e);
         
         // Set line color
+        if (c == null)
+        {
         gc.setStroke(e1.color);
+        }
+        else
+        {
+            gc.setStroke(c);
+        }
         
         // Set line width depending on level
         if (currentLevel <= 3) {
@@ -356,24 +393,24 @@ public class JSF31KochFractalFX extends Application {
     {
         //KOCHTASK LEFT
         // Initialize the progressbar
-        progressBar1.setProgress(ktLeft.getProgress());
-        //progressBar1.progressProperty().bind(ktLeft.progressProperty());
+        //progressBar1.setProgress(ktLeft.getProgress());
+        progressBar1.progressProperty().bind(ktLeft.progressProperty());
 
         // Provides information about count        
         progressLeftNrEdges.textProperty().bind(ktLeft.messageProperty());
         
         //KOCHTASK BOTTOM
         // Initialize the progressbar
-        progressBar2.setProgress(ktBottom.getProgress());
-        //progressBar2.progressProperty().bind(ktBottom.progressProperty());
+        //progressBar2.setProgress(ktBottom.getProgress());
+        progressBar2.progressProperty().bind(ktBottom.progressProperty());
 
         // Provides information about count        
         progressBottomNrEdges.textProperty().bind(ktBottom.messageProperty());
         
         //KOCHTASK RIGHT
         // Initialize the progressbar
-        progressBar3.setProgress(ktRight.getProgress());
-        //progressBar3.progressProperty().bind(ktRight.progressProperty());
+        //progressBar3.setProgress(ktRight.getProgress());
+        progressBar3.progressProperty().bind(ktRight.progressProperty());
 
         // Provides information about count        
         progressRightNrEdges.textProperty().bind(ktRight.messageProperty());

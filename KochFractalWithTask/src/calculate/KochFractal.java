@@ -32,6 +32,8 @@ public class KochFractal extends Observable {
                 double cy = Math.sin(angle) * distabdiv3 + (by - ay) / 3 + ay;
                 final double midabx = (bx - ax) / 3 + ax;
                 final double midaby = (by - ay) / 3 + ay;
+                
+                
                 drawKochEdge(ax, ay, midabx, midaby, n - 1);
                 drawKochEdge(midabx, midaby, cx, cy, n - 1);
                 drawKochEdge(cx, cy, (midabx + bx) / 2, (midaby + by) / 2, n - 1);

@@ -25,7 +25,7 @@ public class KochCallable implements Callable, Observer
     private CyclicBarrier barrier;
     private KochManager manager;
     
-    public KochCallable(int id, int level, CyclicBarrier cb, KochManager manager)
+    public KochCallable(int id, int level, CyclicBarrier cb, KochManager manager) throws InterruptedException
     {
         this.id = id;
         this.koch = new KochFractal();
