@@ -59,6 +59,7 @@ public class KochManager {
     }
 
     public void changeLevel(int nxt) {
+        interuptKochTasks();
         application.clearKochPanel();
         TimeStamp tsTotal = new TimeStamp();
         tsTotal.setBegin("Start total");
@@ -110,7 +111,7 @@ public class KochManager {
             System.out.println(ex.getMessage());
         }
 
-        application.bindKochTaskProperties(ktLeft, ktBottom, ktRight);
+        //application.bindKochTaskProperties(ktLeft, ktBottom, ktRight);
 
         
         
@@ -150,5 +151,27 @@ public class KochManager {
 
     public void readCallables() {
         //application.requestDrawEdges();
+    }
+    
+    private void interuptKochTasks()
+    {
+        if (ktLeft != null)
+        {
+            if (ktLeft.isRunning())
+            {
+                ktLeft.cancel();
+                System.out.println("CANCELED");
+            }
+
+            if (ktBottom.isRunning())
+            {
+                ktBottom.cancel();
+            }
+
+            if (ktRight.isRunning())
+            {
+                ktRight.cancel();
+            }
+        }
     }
 }

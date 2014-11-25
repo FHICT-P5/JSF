@@ -13,7 +13,11 @@ import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.concurrent.Task;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.paint.Color;
 import jsf31kochfractalfx.JSF31KochFractalFX;
 
@@ -43,12 +47,21 @@ public class KochTask extends Task<List<Edge>> implements Observer {
         koch.setLevel(level);
         application = fx;
         
-        
-        //bindKochTaskProperties();
+        bindKochTaskProperties();
     }
     
     @Override
     protected List<Edge> call() throws Exception {
+        
+        final int MAX = (int)Math.pow(4, (level - 1));
+        for (int i = 1; i <= MAX; i++) {
+            if (isCancelled()) {
+                break;
+            }
+
+            updateProgress(i, MAX);
+            updateMessage(String.valueOf(i));
+        }
         
         switch(id)
         {
@@ -63,15 +76,7 @@ public class KochTask extends Task<List<Edge>> implements Observer {
                 break;
         }
         
-        final int MAX = level;
-        for (int i = 1; i <= MAX; i++) {
-            if (isCancelled()) {
-                break;
-            }
-
-            updateProgress(i, MAX);
-            updateMessage(String.valueOf(i));
-        }
+        
                
         return this.edges;
     }
@@ -80,19 +85,19 @@ public class KochTask extends Task<List<Edge>> implements Observer {
         
         try {
             Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(KochTask.class.getName()).log(Level.SEVERE, null, ex);
-        }
         
-        Platform.runLater(new Runnable()
-            {
-                @Override
-                public void run() {
-                    application.drawEdge(input, Color.WHITE);
+            Platform.runLater(new Runnable()
+                {
+                    @Override
+                    public void run() {
+                        application.drawEdge(input, Color.WHITE);
+                    }
+
                 }
-            }
-        );
-        
+            );
+        } catch (InterruptedException ex) {
+            System.out.println("Interupted");
+        }
     }
     
     @Override
@@ -102,33 +107,47 @@ public class KochTask extends Task<List<Edge>> implements Observer {
         this.drawWhiteLine((Edge)o1);
     }
     
-//    private void bindKochTaskProperties()
-//    {
-//        Platform.runLater(new Runnable()
-//            {
-//                @Override
-//                public void run() {
-//                    application.drawEdge(input, Color.WHITE);
-//                }
-//            }
-//        );
-//        switch(id)
-//        {
-//            case 1:
-//                application.getProgressBar1().progressProperty().bind(this.progressProperty());
-//                application.getLabel1().textProperty().bind(this.messageProperty());
-//
-//                break;
-//            case 2:
-//                application.getProgressBar2().progressProperty().bind(this.progressProperty());
-//                application.getLabel2().textProperty().bind(this.messageProperty());
-//
-//                break;
-//            case 3:
-//                application.getProgressBar3().progressProperty().bind(this.progressProperty());
-//                application.getLabel3().textProperty().bind(this.messageProperty());
-//
-//                break;
-//        }
-//    }
+    private void bindKochTaskProperties()
+    {
+        final ProgressBar p1 = application.getProgressBar1();
+        final ProgressBar p2 = application.getProgressBar2();
+        final ProgressBar p3 = application.getProgressBar3();
+        
+        final Label l1 = application.getLabel1();
+        final Label l2 = application.getLabel2();
+        final Label l3 = application.getLabel3();
+        
+        final ReadOnlyDoubleProperty pp = this.progressProperty();
+        final ReadOnlyStringProperty mp = this.messageProperty();
+        
+        Platform.runLater(new Runnable()
+            {
+                @Override
+                public void run() {
+                    switch(id)
+                    {
+                        case 1:
+                            //p1.setProgress(0);
+                            p1.progressProperty().bind(pp);
+                            l1.textProperty().bind(mp);
+                            System.out.println("BINDING");
+                            break;
+                        case 2:
+                            //p2.setProgress(0);
+                            p2.progressProperty().bind(pp);
+                            l2.textProperty().bind(mp);
+
+                            break;
+                        case 3:
+                            //p3.setProgress(0);
+                            p3.progressProperty().bind(pp);
+                            l3.textProperty().bind(mp);
+
+                            break;
+                    }
+                }
+            }
+        );
+        
+    }
 }
