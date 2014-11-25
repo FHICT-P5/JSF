@@ -19,6 +19,7 @@ import javafx.concurrent.Task;
 public class KochTask extends Task<Void> implements Observer {
 
     private int id;
+    private int level;
     
     private ArrayList<Edge> edges;
     private KochFractal koch;
@@ -28,6 +29,7 @@ public class KochTask extends Task<Void> implements Observer {
     public KochTask(int id, int level, CyclicBarrier cb, KochManager manager)
     {
         this.id = id;
+        this.level = level;
         this.koch = new KochFractal();
         this.barrier = cb;
         this.manager = manager;
@@ -52,13 +54,14 @@ public class KochTask extends Task<Void> implements Observer {
     
     @Override
     protected Void call() throws Exception {
-        final int MAX = 50;
+        final int MAX = level;
         for (int i = 1; i <= MAX; i++) {
             if (isCancelled()) {
                 break;
             }
             updateProgress(i, MAX);
             updateMessage(String.valueOf(i));
+            System.out.println("AAAAAAAAAAAAA");
 
             Thread.sleep(100);
         }

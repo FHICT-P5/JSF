@@ -39,9 +39,11 @@ public class KochManager{
     
     private ArrayList<KochTask> KochTasks;
     
+    /*
     Future<ArrayList<Edge>> fut1;
     Future<ArrayList<Edge>> fut2;
     Future<ArrayList<Edge>> fut3;   
+    */
     
     public KochManager(JSF31KochFractalFX application){
         this.application = application;
@@ -55,6 +57,7 @@ public class KochManager{
     }
     
     public void changeLevel(int nxt) {
+        application.clearKochPanel();
         TimeStamp tsTotal = new TimeStamp();
         tsTotal.setBegin("Start total");
         
@@ -62,20 +65,21 @@ public class KochManager{
         
         TimeStamp ts = new TimeStamp();
         ts.setBegin("Start changeLevel");
-        
-        //koch1 = new KochCallable(1, nxt, this.barrier, this);
-        //koch2 = new KochCallable(2, nxt, this.barrier, this);
-        //koch3 = new KochCallable(3, nxt, this.barrier, this);
-        
-        //fut1 = pool.submit(koch1);
-        //fut2 = pool.submit(koch2);
-        //fut3 = pool.submit(koch3);
 
         //application.setTextNrEdges(String.valueOf(koch1.getKochFractal().getNrOfEdges()));
         
         ktLeft = new KochTask(1, nxt, this.barrier, this);
         ktBottom = new KochTask(2, nxt, this.barrier, this);
         ktRight = new KochTask(3, nxt, this.barrier, this);
+        
+        try {
+            ktLeft.call();
+            ktBottom.call();
+            ktRight.call();
+        }
+        catch(Exception ex) {
+            System.out.println(ex.getMessage());
+        }
         
         application.bindKochTaskProperties(ktLeft, ktBottom, ktRight);
         
@@ -104,9 +108,15 @@ public class KochManager{
         
         try
         {
+            /*
             edges.addAll(fut1.get());
             edges.addAll(fut2.get());
             edges.addAll(fut3.get());
+            */
+            
+            ktLeft.call();
+            ktBottom.call();
+            ktRight.call();
         }
         catch(InterruptedException e1)
         {
@@ -115,6 +125,11 @@ public class KochManager{
         catch(ExecutionException e2)
         {
             System.out.println("Excecution went wrong");
+        }
+        catch(Exception e3)
+        {
+            System.out.println("ERROR ERROR");
+            System.out.println(e3.getMessage());
         }
         
         for(Edge e : edges){
