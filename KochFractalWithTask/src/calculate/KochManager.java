@@ -155,23 +155,36 @@ public class KochManager {
     
     private void interuptKochTasks()
     {
-        if (ktLeft != null)
+        try
         {
-            if (ktLeft.isRunning())
-            {
-                ktLeft.cancel();
-                System.out.println("CANCELED");
-            }
-
-            if (ktBottom.isRunning())
-            {
-                ktBottom.cancel();
-            }
-
-            if (ktRight.isRunning())
-            {
-                ktRight.cancel();
-            }
+        ktLeft.cancel();
+        ktBottom.cancel();
+        ktRight.cancel();
+        ktLeft = null;
+        ktBottom = null;
+        ktRight = null;
         }
+        catch (Exception ex)
+        {
+            
+        }
+//        if (ktLeft != null)
+//        {
+//            if (ktLeft.isRunning())
+//            {
+//                ktLeft.cancel();
+//                System.out.println("CANCELED");
+//            }
+//
+//            if (ktBottom.isRunning())
+//            {
+//                ktBottom.cancel();
+//            }
+//
+//            if (ktRight.isRunning())
+//            {
+//                ktRight.cancel();
+//            }
+//        }
     }
 }
