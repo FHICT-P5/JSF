@@ -35,6 +35,8 @@ public class KochTask extends Task<List<Edge>> implements Observer {
     private KochManager manager;
     private JSF31KochFractalFX application;
     private boolean allowDrawWhiteLine;
+    private int max;
+    private int current;
     
     public KochTask(int id, int level, KochManager manager, JSF31KochFractalFX fx) 
     {
@@ -48,6 +50,8 @@ public class KochTask extends Task<List<Edge>> implements Observer {
         koch.setLevel(level);
         application = fx;
         allowDrawWhiteLine = true;
+        max = (int)Math.pow(4, (level - 1));
+        current = 0;
         
         bindKochTaskProperties();
     }
@@ -61,8 +65,8 @@ public class KochTask extends Task<List<Edge>> implements Observer {
                 break;
             }
 
-            updateProgress(i, MAX);
-            updateMessage(String.valueOf(i));
+            //updateProgress(i, MAX);
+            //updateMessage(String.valueOf(i));
         }
         
         switch(id)
@@ -98,6 +102,10 @@ public class KochTask extends Task<List<Edge>> implements Observer {
 
                 }
             );
+            
+            current++;
+            updateProgress(current, max);
+            updateMessage(String.valueOf(current));
         } catch (InterruptedException ex) {
             System.out.println("Interupted");
             allowDrawWhiteLine = false;
