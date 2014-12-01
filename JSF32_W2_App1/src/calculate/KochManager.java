@@ -5,9 +5,11 @@
  */
 package calculate;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,7 @@ public class KochManager implements Observer {
     
     public KochManager()
     {
-        path = "D:\\MyFiles\\Test\\Test.txt";
+        path = "C:\\MyFiles\\Test\\Test.txt";
         edges = new ArrayList<>();
         kochFractal = new KochFractal();
         kochFractal.addObserver(this);
@@ -55,6 +57,11 @@ public class KochManager implements Observer {
             kochFractal.generateBottomEdge();
             kochFractal.generateRightEdge();
         }
+        
+        for(Edge e : edges)
+        {
+            writeToFile(e.toString());
+        }
     }
     
     @Override
@@ -63,6 +70,7 @@ public class KochManager implements Observer {
         //this.edges.add((Edge)o1);
         //writeToFile(((Edge)o1).toString());
         this.edges.add((Edge)o1);
+        System.out.println("Edge added");
     }
     
     private void clearFile()
@@ -72,15 +80,13 @@ public class KochManager implements Observer {
     
     private void writeToFile(String s)
     {
-        PrintWriter output;
         try
         {
-            //OutputStream buffer = new BufferedOutputStream(file);
+            OutputStream buffer = new BufferedOutputStream(file);
             //ObjectOutput output = new ObjectOutputStream(buffer);
             //output.writeObject(s);
             System.out.println(s);
-            output = new PrintWriter(new BufferedWriter(new FileWriter(path, true)));
-            output.println(s);
+            PrintWriter output = new PrintWriter(new BufferedWriter(new FileWriter(path, true)));
             output.println(s);
             output.close();
         }
