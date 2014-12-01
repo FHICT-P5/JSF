@@ -81,9 +81,7 @@ public class KochTask extends Task<List<Edge>> implements Observer {
                 koch.generateBottomEdge();
                 break;
         }
-        
-        
-               
+         
         return this.edges;
     }
     
