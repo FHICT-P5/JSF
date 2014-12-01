@@ -67,10 +67,7 @@ public class KochManager implements Observer {
     @Override
     public void update(Observable o, Object o1)
     {
-        //this.edges.add((Edge)o1);
-        //writeToFile(((Edge)o1).toString());
         this.edges.add((Edge)o1);
-        System.out.println("Edge added");
     }
     
     private void clearFile()
@@ -82,10 +79,10 @@ public class KochManager implements Observer {
     {
         try
         {
-            OutputStream buffer = new BufferedOutputStream(file);
+            //OutputStream buffer = new BufferedOutputStream(file);
             //ObjectOutput output = new ObjectOutputStream(buffer);
             //output.writeObject(s);
-            System.out.println(s);
+
             PrintWriter output = new PrintWriter(new BufferedWriter(new FileWriter(path, true)));
             output.println(s);
             output.close();
