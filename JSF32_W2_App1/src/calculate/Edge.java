@@ -28,7 +28,7 @@ public class Edge {
     public String toString()
     {
         String edgeString = "";
-        edgeString = X1 + ", " + Y1 + " - " + X2 + ", " + Y2 + " - " + color.toString();
+        edgeString = X1 + "-" + Y1 + "-" + X2 + "-" + Y2 + "-" + color.toString();
         return edgeString;
     }
 }

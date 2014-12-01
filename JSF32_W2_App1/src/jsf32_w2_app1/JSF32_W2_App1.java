@@ -5,33 +5,97 @@
  */
 package jsf32_w2_app1;
 
+import calculate.Edge;
 import calculate.KochManager;
 import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
  *
  * @author Juliusername
  */
-public class JSF32_W2_App1 {
+public class JSF32_W2_App1 extends Application {
 
-    
+    private Canvas canvas;
     private KochManager kochManager;
+    private int currentLevel;
+    
+    
+    public JSF32_W2_App1()
+    {
+        
+    }
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
         
-       JSF32_W2_App1 app = new JSF32_W2_App1();
-       app.start();
+       launch(args);
     }
 
-    public void start()
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        
+        canvas = new Canvas(500, 500);
+        GraphicsContext gc= canvas.getGraphicsContext2D();
+          gc.setFill(Color.BLACK);
+          gc.fillRect(0,0,canvas.getWidth(),canvas.getHeight());
+          
+          currentLevel = 1;
+        
+          kochManager = new KochManager(this);
+          kochManager.start();
+        
+          StackPane root = new StackPane();
+          
+          
+          root.getChildren().add(canvas);
+        
+          Scene scene;
+          scene = new Scene(root, 600, 600);
+       
+          primaryStage.setScene(scene);
+          primaryStage.setTitle("Kochfractals apps");
+          //primaryStage.addEventFilter(EventType.ROOT, null);
+          primaryStage.show();
+        
+          return;
+    }
+
+    public void drawEdge(Edge e)
     {
-        kochManager = new KochManager();
-        kochManager.start();
+        try
+        {
+        // Graphics
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+               
+        gc.setStroke(e.color);
+        
+        //Set line width depending on level
+        if (currentLevel <= 3) {
+            gc.setLineWidth(2.0);
+        }
+        else if (currentLevel <=5 ) {
+            gc.setLineWidth(1.5);
+        }
+        else {
+            gc.setLineWidth(1.0);
+        }
+        
+        //Draw line
+        gc.strokeLine(e.X1,e.Y1,e.X2,e.Y2);
+               
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Draw Edge Exception: " + ex);
+        }
     }
-
-    
 }
