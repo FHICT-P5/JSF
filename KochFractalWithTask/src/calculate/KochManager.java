@@ -79,17 +79,17 @@ public class KochManager {
             @Override
             public void handle(Event event) {
                 if (ktLeft.isDone() && ktRight.isDone() && ktBottom.isDone()) {
-                    
+
                     ktLeft.setOnSucceeded(null);
                     ktBottom.setOnSucceeded(null);
                     ktRight.setOnSucceeded(null);
-                    
+
                     try {
                         edges.addAll(ktLeft.get());
                         edges.addAll(ktBottom.get());
                         edges.addAll(ktRight.get());
                         // draw stuff
-                        
+
                         application.requestDrawEdges();
                     } catch (InterruptedException | ExecutionException ex) {
                         Logger.getLogger(KochManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -97,7 +97,7 @@ public class KochManager {
                 }
             }
         };
-        
+
         ktLeft.setOnSucceeded(doneHandler);
         ktBottom.setOnSucceeded(doneHandler);
         ktRight.setOnSucceeded(doneHandler);
@@ -112,9 +112,6 @@ public class KochManager {
         }
 
         //application.bindKochTaskProperties(ktLeft, ktBottom, ktRight);
-
-        
-        
         ts.setEnd("Einde changeLevel");
         application.setTextCalc(ts.toString());
 
@@ -139,8 +136,6 @@ public class KochManager {
 
         application.clearKochPanel();
 
-        
-
         for (Edge e : edges) {
             application.drawEdge(e, null);
         }
@@ -152,21 +147,17 @@ public class KochManager {
     public void readCallables() {
         //application.requestDrawEdges();
     }
-    
-    private void interuptKochTasks()
-    {
-        try
-        {
-        ktLeft.cancel();
-        ktBottom.cancel();
-        ktRight.cancel();
-        ktLeft = null;
-        ktBottom = null;
-        ktRight = null;
-        }
-        catch (Exception ex)
-        {
-            
+
+    private void interuptKochTasks() {
+        try {
+            ktLeft.cancel();
+            ktBottom.cancel();
+            ktRight.cancel();
+            ktLeft = null;
+            ktBottom = null;
+            ktRight = null;
+        } catch (Exception ex) {
+
         }
 //        if (ktLeft != null)
 //        {
