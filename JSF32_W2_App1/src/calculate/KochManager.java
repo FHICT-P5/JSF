@@ -42,7 +42,7 @@ public class KochManager implements Observer {
     private KochFractal kochFractal;
     private String textPath;
     private String binaryPath;
-    private boolean read;
+    public boolean read;
     private boolean outputType;
     private boolean useBuffer;
     private int level;
@@ -62,7 +62,7 @@ public class KochManager implements Observer {
     
     public void start()
     {       
-        level = 1;
+        level = 2;
         Scanner input = new Scanner(System.in);
         
         System.out.print("[R]ead or [W]rite?");
@@ -110,16 +110,19 @@ public class KochManager implements Observer {
             return;
         }
         
-        if (read == false)
+        if (outputType)
         {
             //Clear file
             clearFile();
-            
-            //Write
-            System.out.print("Level: ");
-            int levelInput = input.nextInt();
-            level = levelInput;
+        }
 
+        //Write
+        System.out.print("Level: ");
+        int levelInput = input.nextInt();
+        level = levelInput;
+        
+        if (read == false)
+        {
             if (levelInput > 0 || levelInput <= 10)
             {
                 kochFractal.setLevel(levelInput);
@@ -201,6 +204,7 @@ public class KochManager implements Observer {
                 List<Edge> output = new ArrayList<>();
                 String file;
                 ObjectInputStream reader = null;
+                              
                 try {
                     if (useBuffer) {
                         file = binaryPath + File.separator + String.valueOf(level) + "BufferedBinary";
@@ -213,22 +217,29 @@ public class KochManager implements Observer {
                         InputStream is = new FileInputStream(file);
                         reader = new ObjectInputStream(is);
                     }
-                 output = (List<Edge>)reader.readObject();
+                    output = (List<Edge>)reader.readObject();
                  
-                 edges = output;
-                 
+                    edges = output;
+                                 
                     System.out.println("Output size: " + output.size());
                  
-                 for (Edge e : edges)
-                 {
-                     //e.readObject(reader);
-                     System.out.println("Color: " + e.color.toString());
-                     application.drawEdge(e);
-                 }
+                    for (Edge e : edges)
+                    {
+                        if (e != null)
+                        {
+                            //e.readObject(reader);
+                            //System.out.println("Color: " + e.color.toString());
+                            application.drawEdge(e);
+                        }
+                        else
+                        {
+                            System.out.println("Edge is null");
+                        }
+                    }
                  
-            } catch (Exception ex) {
-                System.out.println("Binary Read Exception: " + ex.getMessage());
-            }
+                } catch (Exception ex) {
+                    System.out.println("Binary Read Exception: " + ex.getMessage());
+                }
             }
         }
         catch (Exception ex)

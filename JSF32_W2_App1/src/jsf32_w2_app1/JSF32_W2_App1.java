@@ -52,25 +52,36 @@ public class JSF32_W2_App1 extends Application {
         
           kochManager = new KochManager(this);
           kochManager.start();
-        
-          StackPane root = new StackPane();
           
-          
-          root.getChildren().add(canvas);
-        
-          Scene scene;
-          scene = new Scene(root, 600, 600);
-       
-          primaryStage.setScene(scene);
-          primaryStage.setTitle("Kochfractals apps");
-          //primaryStage.addEventFilter(EventType.ROOT, null);
-          primaryStage.show();
-        
-          return;
+          if (kochManager.read)
+          {
+            StackPane root = new StackPane();
+
+
+            root.getChildren().add(canvas);
+
+            Scene scene;
+            scene = new Scene(root, 600, 600);
+
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("Kochfractals apps");
+            //primaryStage.addEventFilter(EventType.ROOT, null);
+            primaryStage.show();
+          }
+          else
+          {
+              this.stop();
+              
+          }
     }
 
     public void drawEdge(Edge e)
     {
+        e.X1 *= 500;
+        e.Y1 *= 500;
+        e.X2 *= 500;
+        e.Y2 *= 500;
+        
         try
         {
         // Graphics
