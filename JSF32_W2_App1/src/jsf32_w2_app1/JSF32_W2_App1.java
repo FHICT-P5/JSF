@@ -76,7 +76,14 @@ public class JSF32_W2_App1 extends Application {
         // Graphics
         GraphicsContext gc = canvas.getGraphicsContext2D();
                
-        gc.setStroke(e.color);
+        if (e.color == null)
+        {
+            gc.setStroke(Color.valueOf(e.colorString));
+        }
+        else
+        {
+            gc.setStroke(e.color);
+        }
         
         //Set line width depending on level
         if (currentLevel <= 3) {
