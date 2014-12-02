@@ -42,8 +42,8 @@ public class KochManager implements Observer {
     public KochManager(JSF32_W2_App1 application)
     {
         this.application = application;
-        textPath = "D:\\MyFiles\\Test\\Test.txt";
-        binaryPath = "D:\\MyFiles\\Test\\Binary.bin";
+        textPath = "C:\\Users\\Julius\\Test\\Test.txt";
+        binaryPath = "C:\\Users\\Julius\\Test\\Binary.bin";
         edges = new ArrayList<>();
         kochFractal = new KochFractal();
         kochFractal.addObserver(this);
@@ -103,13 +103,16 @@ public class KochManager implements Observer {
         
         if (read == false)
         {
+            //Clear file
+            clearFile();
+            
             //Write
             System.out.print("Level: ");
             int levelInput = input.nextInt();
 
             if (levelInput > 0 || levelInput <= 10)
             {
-                //writeToFile("Level: " + levelInput, false);
+                writeToFile("Level: " + levelInput, false);
 
                 kochFractal.setLevel(levelInput);
                 kochFractal.generateLeftEdge();
@@ -122,7 +125,7 @@ public class KochManager implements Observer {
             
             for(Edge e : edges)
             {
-                writeToFile(e, true);
+                writeToFile(e.toString(), true);
             }
             
             tsWrite.setEnd("end writing");
@@ -251,7 +254,7 @@ public class KochManager implements Observer {
         }
     }
        
-    private void writeToFile(Object o, boolean append)
+    private void writeToFile(String s, boolean append)
     {
         try
         {
@@ -267,7 +270,7 @@ public class KochManager implements Observer {
                     output = new PrintWriter(new FileWriter(textPath, append));
                 }
                 
-                output.println(((Edge)o).toString());
+                output.println(s);
                 output.close();
             }
             else
@@ -277,7 +280,7 @@ public class KochManager implements Observer {
 //                os.close();
                 
                 ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(binaryPath, true));
-                os.write(((Edge)o).toString().getBytes());
+                os.write(s.getBytes());
                 os.close();
             }
         }
@@ -288,6 +291,36 @@ public class KochManager implements Observer {
         finally
         {
             
+        }
+    }
+    
+    private void clearFile()
+    {
+        if (outputType == true)
+        {
+            try
+            {
+            PrintWriter writer = new PrintWriter(textPath);
+            writer.print("");
+            writer.close();
+            }
+            catch (Exception ex)
+            {
+                System.out.println("Clearfile Exception: " + ex.getMessage());
+            }
+        }
+        else
+        {
+            try
+            {
+            PrintWriter writer = new PrintWriter(binaryPath);
+            writer.print("");
+            writer.close();
+            }
+            catch (Exception ex)
+            {
+                System.out.println("Clearfile Exception: " + ex.getMessage());
+            }
         }
     }
 }
