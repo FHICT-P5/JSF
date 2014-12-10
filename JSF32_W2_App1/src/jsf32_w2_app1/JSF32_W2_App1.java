@@ -77,10 +77,10 @@ public class JSF32_W2_App1 extends Application {
 
     public void drawEdge(Edge e)
     {
-        e.X1 *= 500;
-        e.Y1 *= 500;
-        e.X2 *= 500;
-        e.Y2 *= 500;
+//        e.X1 *= 500;
+//        e.Y1 *= 500;
+//        e.X2 *= 500;
+//        e.Y2 *= 500;
         
         try
         {

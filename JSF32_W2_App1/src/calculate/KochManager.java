@@ -50,7 +50,7 @@ public class KochManager implements Observer {
     public KochManager(JSF32_W2_App1 application)
     {
         this.application = application;
-        textPath = "C:\\Users\\Julius\\Test\\Test.txt";
+        textPath = "C:\\Users\\Julius\\Test";
         binaryPath = "C:\\Users\\Julius\\Test";
         edges = new ArrayList<>();
         kochFractal = new KochFractal();
@@ -115,7 +115,7 @@ public class KochManager implements Observer {
             //Clear file
             clearFile();
         }
-
+        
         //Write
         System.out.print("Level: ");
         int levelInput = input.nextInt();
@@ -173,7 +173,8 @@ public class KochManager implements Observer {
                 String content = null;
                 File file; 
             
-                file = new File(textPath);
+                file = new File(textPath + "\\Level_" + level + ".txt");
+                System.out.println(file);
                 
                 if (useBuffer == true)
                 {
@@ -229,6 +230,12 @@ public class KochManager implements Observer {
                         {
                             //e.readObject(reader);
                             //System.out.println("Color: " + e.color.toString());
+                            System.out.println("TEST");
+                            
+                            e.X1 *= 500;
+                            e.Y1 *= 500;
+                            e.X2 *= 500;
+                            e.Y2 *= 500;
                             application.drawEdge(e);
                         }
                         else
@@ -297,11 +304,11 @@ public class KochManager implements Observer {
                 PrintWriter output;
                 if (useBuffer == true)
                 {
-                    output = new PrintWriter(new BufferedWriter(new FileWriter(textPath, append)));
+                    output = new PrintWriter(new BufferedWriter(new FileWriter(textPath + "\\Level_" + level + ".txt", append)));
                 }
                 else
                 {
-                    output = new PrintWriter(new FileWriter(textPath, append));
+                    output = new PrintWriter(new FileWriter(textPath + "\\Level_" + level + ".txt", append));
                 }
                 
                 for (Edge e : edges)
