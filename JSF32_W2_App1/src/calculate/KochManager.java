@@ -134,7 +134,7 @@ public class KochManager implements Observer {
 //            clearFile();
 //        }
         
-        //Write
+        
         System.out.print("Level: ");
         int levelInput = input.nextInt();
         level = levelInput;
@@ -274,29 +274,42 @@ public class KochManager implements Observer {
                     
                     System.out.println("Mapped file reading start");
                     
-                    RandomAccessFile raf = new RandomAccessFile(binaryPath + "\\" + level + "BufferedBinary", "rw");
+                    RandomAccessFile raf = new RandomAccessFile(binaryPath + "\\" + level + "MappedBinary", "rw");
+                   
                     
-                    MappedByteBuffer mbb = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, 10000);
+                    //MappedByteBuffer mbb = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, 10000);
+
                     
                     String chars = "";
                     
-                    for (int i = 0; i < 10000; i++)
-                    {
-                        try
-                        {
-                            char c = (char)mbb.getChar(i);
-                            chars += c;
-                        }
-                        catch(Exception ex)
-                        {
-                            System.out.println("MappedFileReading Exception: " + ex.getMessage());
-                            break;
-                        }
-                    }
+                    chars = raf.readLine();
                     
+                    
+//                    for (int i = 0; i < 10000; i++)
+//                    {
+//                        try
+//                        {
+//                            char c = (char)mbb.getChar(i);
+//                            chars += c;
+//                        }
+//                        catch(Exception ex)
+//                        {
+//                            System.out.println("MappedFileReading Exception: " + ex.getMessage());
+//                            break;
+//                        }
+//                    }
+                    
+                    
+                    
+                    raf.close();
+                    
+                    chars = chars.replaceAll("\\.", "Z");
+                    chars = chars.replaceAll("\\W","");
+                    chars = chars.replaceAll("Z", "\\.");
+      
                     System.out.println("Mapped file reading done");
                     
-                    System.out.println(chars);
+                    System.out.println("READ: " + chars);
                     
                     createEdges(chars);
                     System.out.println("Edge creation done");
@@ -313,7 +326,7 @@ public class KochManager implements Observer {
     
     private void createEdges(String content)
     {
-        if (outputType == true)
+        if (true)
         {
             String[] lines = content.split(System.getProperty("line.separator"));
 
@@ -332,12 +345,17 @@ public class KochManager implements Observer {
                             double Y2 = Double.parseDouble(attributes[3]) * 500;
                             Color c = Color.web(attributes[4]);
 
+                            System.out.println("X1: " + X1);
+                            System.out.println("Y1: " + Y1);
+                            System.out.println("X2: " + X2);
+                            System.out.println("Y2: " + Y2);
+                            
                             if (useMappedFile)
                             {
-                                X1 *= 500;
-                                Y1 *= 500;
-                                X2 *= 500;
-                                Y2 *= 500;
+                                //X1 *= 500;
+                                //Y1 *= 500;
+                                //X2 *= 500;
+                                //Y2 *= 500;
                             }
 
                             Edge e = new Edge(X1, Y1, X2, Y2, c);
@@ -356,6 +374,8 @@ public class KochManager implements Observer {
         {
             
         }
+        
+        System.out.println("HERE");
     }
        
     private void writeToFile(boolean append)
@@ -421,17 +441,24 @@ public class KochManager implements Observer {
                         charList.add(chars);
                     }
                     
-                    RandomAccessFile raf = new RandomAccessFile(binaryPath + "\\" + level + "BufferedBinary", "rw");
+                    
+                    RandomAccessFile raf = new RandomAccessFile(binaryPath + "\\" + level + "MappedBinary", "rw");
                     int count = 10000;
-                    MappedByteBuffer mbb = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, count);
+                    //MappedByteBuffer mbb = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, count);
                     
                     for (char[] chars : charList)
                     {
                         for (char c : chars)
                         {
-                            mbb.putChar(c);
+                            //mbb.putChar(c);
+                            System.out.println(c);
+                            raf.writeChar(c);
                         }
                     }
+                    //raf.writeChars("ABC");
+                    
+                    raf.close();
+                    
                     System.out.println("Mapped file writing done.");
                 }
             }
