@@ -304,9 +304,11 @@ public class KochManager implements Observer {
                     raf.close();
                     
                     chars = chars.replaceAll("\\.", "Z");
+                    chars = chars.replaceAll(System.getProperty("line.separator"), "Q");
                     chars = chars.replaceAll("\\W","");
                     chars = chars.replaceAll("Z", "\\.");
-      
+                    chars = chars.replaceAll("Q", System.getProperty("line.separator"));
+                    
                     System.out.println("Mapped file reading done");
                     
                     System.out.println("READ: " + chars);
@@ -328,7 +330,7 @@ public class KochManager implements Observer {
     {
         if (true)
         {
-            String[] lines = content.split(System.getProperty("line.separator"));
+            String[] lines = content.split("P"); //content.split(System.getProperty("line.separator"));
 
             for (String line : lines)
             {
@@ -352,10 +354,10 @@ public class KochManager implements Observer {
                             
                             if (useMappedFile)
                             {
-                                //X1 *= 500;
-                                //Y1 *= 500;
-                                //X2 *= 500;
-                                //Y2 *= 500;
+//                                X1 *= 500;
+//                                Y1 *= 500;
+//                                X2 *= 500;
+//                                Y2 *= 500;
                             }
 
                             Edge e = new Edge(X1, Y1, X2, Y2, c);
@@ -375,7 +377,6 @@ public class KochManager implements Observer {
             
         }
         
-        System.out.println("HERE");
     }
        
     private void writeToFile(boolean append)
@@ -406,28 +407,41 @@ public class KochManager implements Observer {
                 output.close();
             }
             else
-            {
-                System.out.println("CCC");
-                
+            {               
                 if (useMappedFile == false)
                 {
-                    System.out.println("DDD");
-                    
                     String file = binaryPath + File.separator + level + "BufferedBinary";
                     ObjectOutputStream os;
-                    try {
+                    
+                    if (useBuffer == true)
+                    {
+                        try {
                         os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
                         os.writeObject(edges);
                         os.flush();
                         os.close();
+                        } catch (IOException ex) {
+
+                        }
+                    }
+                    else
+                    {
+                        try {
+                            os = new ObjectOutputStream(new FileOutputStream(file));
+                            os.writeObject(edges);
+                            os.flush();
+                            os.close();
                     } catch (IOException ex) {
 
                     }
+                                }
+//                    for (Edge e : edges)
+//                    {
+//                        application.drawEdge(e);
+//                    }
                 }
                 else
-                {
-                    System.out.println("EEE");
-                    
+                {                   
                     //Mapped file write
                     
                     System.out.println("Mapped file writing start");
@@ -443,7 +457,7 @@ public class KochManager implements Observer {
                     
                     
                     RandomAccessFile raf = new RandomAccessFile(binaryPath + "\\" + level + "MappedBinary", "rw");
-                    int count = 10000;
+                    //int count = 10000;
                     //MappedByteBuffer mbb = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, count);
                     
                     for (char[] chars : charList)
@@ -451,9 +465,9 @@ public class KochManager implements Observer {
                         for (char c : chars)
                         {
                             //mbb.putChar(c);
-                            System.out.println(c);
                             raf.writeChar(c);
                         }
+                        raf.writeChar('P');
                     }
                     //raf.writeChars("ABC");
                     
