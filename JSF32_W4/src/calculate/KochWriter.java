@@ -5,15 +5,11 @@
  */
 package calculate;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,33 +36,62 @@ public class KochWriter implements Runnable {
     
     public void writeFile()
     {
-        String file = path + File.separator + level + "Binary";
-        ObjectOutputStream os;
+        FileChannel fc;
+        FileLock fl;
+        
+        System.out.println("Mapped file writing start");
+                    
+        List<char[]> charList = new ArrayList();
 
-        if (useBuffer == true)
+        for (Edge e : edges)
         {
-            try {
-            os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
-            os.writeObject(edges);
-            os.flush();
-            os.close();
-            } catch (IOException ex) {
-                System.out.println("IOException ex: " + ex.getMessage());
-            }
+            char[] chars = e.toString().toCharArray();
+
+            charList.add(chars);
         }
-        else
+
+        try
         {
-            try {
-                os = new ObjectOutputStream(new FileOutputStream(file));
-                os.writeObject(edges);
-                os.flush();
-                os.close();
-            } catch (IOException ex) {
-                System.out.println("IOException ex: " + ex.getMessage());
+        RandomAccessFile raf = new RandomAccessFile(path + "\\" + level + "MappedBinary", "rw");
+        //int count = 10000;
+        //MappedByteBuffer mbb = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, count);
+
+        fc = raf.getChannel();
+        fl = fc.lock(0, raf.length(), false);
+        
+        for (char[] chars : charList)
+        {
+            for (char c : chars)
+            {
+                //mbb.putChar(c);
+                raf.writeChar(c);
+            }
+            raf.writeChar('P');
+        }
+        //raf.writeChars("ABC");
+
+        raf.close();
+        
+        if (fl != null)
+        {
+            try
+            {
+                fl.release();
+            }
+            catch (Exception ex)
+            {
+                System.out.println("Exception @fl.release" + ex.getMessage());
             }
         }
         
+        System.out.println("Mapped file writing done.");
+        
         System.out.println("Writing done");
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Exception @writeFile: " + ex.getMessage());
+        }
     }
 
     @Override

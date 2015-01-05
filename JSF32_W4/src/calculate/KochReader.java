@@ -10,8 +10,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.paint.Color;
 
 /**
  *
@@ -34,56 +38,103 @@ public class KochReader implements Runnable {
     
     public void readFile()
     {
-        //Binary to object
-        List<Edge> output = new ArrayList<>();
-        String file;
-        ObjectInputStream reader = null;
-
-        try {
-            if (useBuffer) {
-                file = path + File.separator + String.valueOf(level) + "Binary";
-                System.out.println(file);
-                InputStream is = new FileInputStream(file);
-                reader = new ObjectInputStream(new BufferedInputStream(is));
-            } else {
-                file = path + File.separator + String.valueOf(level) + "Binary";
-                System.out.println(file);
-                InputStream is = new FileInputStream(file);
-                reader = new ObjectInputStream(is);
-            }
-            output = (List<Edge>)reader.readObject();
-
-            System.out.println("Output size: " + output.size());
-
-            for (Edge e : output)
-            {
-                if (e != null)
-                {
-                    //e.readObject(reader);
-                    //System.out.println("Color: " + e.color.toString());
-                    System.out.println("TEST");
-
-                    e.X1 *= 500;
-                    e.Y1 *= 500;
-                    e.X2 *= 500;
-                    e.Y2 *= 500;
-                    manager.drawEdge(e);
-                }
-                else
-                {
-                    System.out.println("Edge is null");
-                }
-            }
-
-        } catch (Exception ex) {
-            System.out.println("Binary Read Exception: " + ex.getMessage());
-        }
+        System.out.println("Mapped file reading start");
+                
+        FileChannel fc;
+        FileLock fl;
         
-        System.out.println("Reading done");
+        try
+        {
+            RandomAccessFile raf = new RandomAccessFile(path + "\\" + level + "MappedBinary", "rw");
+
+            //MappedByteBuffer mbb = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, 10000);
+            fc = raf.getChannel();
+            fl = fc.lock(0, raf.length(), false);
+
+            String chars = "";
+
+            chars = raf.readLine();
+
+            raf.close();
+
+            chars = chars.replaceAll("\\.", "Z");
+            chars = chars.replaceAll(System.getProperty("line.separator"), "Q");
+            chars = chars.replaceAll("\\W","");
+            chars = chars.replaceAll("Z", "\\.");
+            chars = chars.replaceAll("Q", System.getProperty("line.separator"));
+
+            System.out.println("Mapped file reading done");
+
+            System.out.println("READ: " + chars);
+
+            if (fl != null)
+            {
+                try
+                {
+                    fl.release();
+                }
+                catch (Exception ex)
+                {
+                    System.out.println("Exception @fl.release" + ex.getMessage());
+                }
+            }
+            
+            createEdges(chars);
+            System.out.println("Edge creation done");
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Exception @readFile: " + ex.getMessage());
+        }
     }
 
     @Override
     public void run() {
         readFile();
+    }
+    
+    private void createEdges(String content)
+    {
+        if (true)
+        {
+            String[] lines = content.split("P"); //content.split(System.getProperty("line.separator"));
+
+            for (String line : lines)
+            {
+                if (!line.contains("Level"))
+                {
+                    String[] attributes = line.split("_");
+                    if (attributes.length == 5)
+                    {
+                        try
+                        {
+                            double X1 = Double.parseDouble(attributes[0]) * 500;
+                            double Y1 = Double.parseDouble(attributes[1]) * 500;
+                            double X2 = Double.parseDouble(attributes[2]) * 500;
+                            double Y2 = Double.parseDouble(attributes[3]) * 500;
+                            Color c = Color.web(attributes[4]);
+
+//                            System.out.println("X1: " + X1);
+//                            System.out.println("Y1: " + Y1);
+//                            System.out.println("X2: " + X2);
+//                            System.out.println("Y2: " + Y2);
+
+                            Edge e = new Edge(X1, Y1, X2, Y2, c);
+
+                            manager.drawEdge(e);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.out.println("Edge Exception: " + ex.getMessage());
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            
+        }
+        
     }
 }
