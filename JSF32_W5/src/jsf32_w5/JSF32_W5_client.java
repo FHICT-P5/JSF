@@ -6,6 +6,11 @@
 package jsf32_w5;
 
 import calculate.Edge;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.nio.channels.Channels;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -110,11 +115,21 @@ public class JSF32_W5_client extends Application {
     
     private void scannerInstructions()
     {
-        Scanner input = new Scanner(System.in);
+        SocketChannel sc;
+        
+        try {
+            sc = SocketChannel.open(new InetSocketAddress("localhost", 1090));
+        } catch (IOException ex) {
+            System.out.println("IOException @SocketChannel");
+            return;
+        }
+        
+        List<Edge> edges = new ArrayList();
+        OutputStream outStream = Channels.newOutputStream(sc);
         
         int level;
-        boolean useBuffer;
         
+        Scanner input = new Scanner(sc);
         System.out.print("Level: ");
         String readWriteString = input.nextLine();
         try
@@ -126,9 +141,6 @@ public class JSF32_W5_client extends Application {
             System.out.println("Exception: " + ex.getMessage());
             return;
         }
-        
-        
-        List<Edge> edges = getEdgesFromServer(level);
         
         for (Edge edge : edges)
         {
