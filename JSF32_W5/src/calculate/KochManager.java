@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Scanner;
-import jsf32_w5.JSF32_W5_server;
+import server.JSF32_W5_server;
 
 /**
  *
