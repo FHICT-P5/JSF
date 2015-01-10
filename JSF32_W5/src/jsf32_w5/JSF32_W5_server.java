@@ -6,7 +6,6 @@
 package jsf32_w5;
 
 import calculate.Edge;
-import calculate.KnockKnockProtocol;
 import calculate.KochManager;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -52,16 +51,16 @@ public class JSF32_W5_server extends Application {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 
-                KnockKnockProtocol kkp = new KnockKnockProtocol();
-                outputLine = kkp.processInput(null);
-                out.println(outputLine);
-                
-                 while ((inputLine = in.readLine()) != null) {
-                    outputLine = kkp.processInput(inputLine);
-                    out.println(outputLine);
-                    if (outputLine.equals("Bye."))
-                    break;
-                 }
+//                KnockKnockProtocol kkp = new KnockKnockProtocol();
+//                outputLine = kkp.processInput(null);
+//                out.println(outputLine);
+//                
+//                 while ((inputLine = in.readLine()) != null) {
+//                    outputLine = kkp.processInput(inputLine);
+//                    out.println(outputLine);
+//                    if (outputLine.equals("Bye."))
+//                    break;
+//                 }
                 
                 Scanner input = new Scanner(clientSocket.getChannel());
                 
@@ -92,8 +91,8 @@ public class JSF32_W5_server extends Application {
     
     public synchronized List<Edge> generateKochFractal(int level)
     {
-        KochManager kochManager = new KochManager(this);
-        kochManager.generateEdges(level);
+        //KochManager kochManager = new KochManager(this);
+        //kochManager.generateEdges(level);
         
         //TODO: add generated edges to this list
         List<Edge> edges = new ArrayList();
