@@ -63,7 +63,6 @@ public class JSF32_W5_client extends Application {
         currentLevel = 1;
         
         client = new ClientSession(this);
-        
                   
         StackPane root = new StackPane();
 
