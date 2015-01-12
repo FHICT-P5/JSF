@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,16 +41,43 @@ public class ClientSession {
             this.app = app;
             socket = new Socket(hostName, portNumber);
             
-            this.inStream = socket.getInputStream();
             this.outStream = socket.getOutputStream();
+            this.inStream = socket.getInputStream();            
             
-            this.in = new ObjectInputStream(inStream);
             this.out = new ObjectOutputStream(outStream);
+            out.flush();
+            this.in = new ObjectInputStream(inStream);
             
-            while(true) {
-                Object inObject = in.readObject();
-                System.out.println(inObject);
+            
+            Object inObject = in.readObject();
+            System.out.println(inObject);
+
+            Scanner scanner = new Scanner(System.in);
+            String readWriteString = scanner.nextLine();
+            int level;
+
+            try {
+                level = Integer.parseInt(readWriteString);
+                if(level < 1)
+                    level = 1;
+                else if(level > 9)
+                    level = 9;
             }
+            catch (Exception ex) {
+                System.out.println("Exception: " + ex.getMessage());
+                level = 1;
+            }
+
+            out.writeObject(level);
+            out.flush();
+
+            edges = (List<Edge>) in.readObject();
+            System.out.println("Edges received");
+
+            for(Edge e : edges) {
+                app.drawEdge(e);
+            }
+            
         } catch (IOException ex) {
             Logger.getLogger(ClientSession.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {

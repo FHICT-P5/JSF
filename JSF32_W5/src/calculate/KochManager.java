@@ -11,6 +11,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Scanner;
 import server.JSF32_W5_server;
+import server.ServerSession;
 
 /**
  *
@@ -18,25 +19,25 @@ import server.JSF32_W5_server;
  */
 public class KochManager implements Observer {
     
-    private JSF32_W5_server application;
     private List<Edge> edges;
     private KochFractal kochFractal;
     
-    public KochManager(JSF32_W5_server application)
+    public KochManager()
     {
-        this.application = application;
         edges = new ArrayList<>();
         kochFractal = new KochFractal();
         kochFractal.addObserver(this);
     }
     
-    public void generateEdges(int level)
+    public List<Edge> generateEdges(int level)
     {
         System.out.println("Generating edges");
         kochFractal.setLevel(level);
         kochFractal.generateLeftEdge();
         kochFractal.generateBottomEdge();
         kochFractal.generateRightEdge();
+        
+        return edges;
     }
     
     public synchronized void drawEdge(Edge e)

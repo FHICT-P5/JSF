@@ -52,14 +52,5 @@ public class JSF32_W5_server {
         }
     }
     
-    public synchronized List<Edge> generateKochFractal(int level)
-    {
-        KochManager kochManager = new KochManager(this);
-        kochManager.generateEdges(level);
-        
-        //TODO: add generated edges to this list
-        List<Edge> edges = new ArrayList();
-        
-        return edges;
-    }
+
 }
