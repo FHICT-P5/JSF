@@ -50,9 +50,19 @@ public class ServerSession implements Runnable{
     private boolean allEdges;
     
     public ServerSession(Socket client, int clientId) {
-        try {
-            this.client = client;
-            this.id = clientId;
+        this.client = client;
+        this.id = clientId;
+    }
+    
+    public synchronized List<Edge> generateKochFractal(int level)
+    {
+        KochManager kochManager = new KochManager();
+        return kochManager.generateEdges(level);
+    }
+    
+    @Override
+    public void run() {
+            try {
             
             this.inStream = client.getInputStream();
             this.outStream = client.getOutputStream();
@@ -78,7 +88,7 @@ public class ServerSession implements Runnable{
             if (allEdges)
             {
                 out.writeObject(edges);
-                System.out.println("Edges sent");
+                System.out.println("All Edges sent");
             }
             else
             {
@@ -87,7 +97,7 @@ public class ServerSession implements Runnable{
                     out.writeObject(edges.get(i));
                     out.flush();
                 }
-                System.out.println("Edges sent");
+                System.out.println("Single Edges sent");
             }
             
         } catch (IOException ex) {
@@ -130,17 +140,6 @@ public class ServerSession implements Runnable{
                 Logger.getLogger(ServerSession.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    }
-    
-    public synchronized List<Edge> generateKochFractal(int level)
-    {
-        KochManager kochManager = new KochManager();
-        return kochManager.generateEdges(level);
-    }
-    
-    @Override
-    public void run() {
-            
     }
     
     

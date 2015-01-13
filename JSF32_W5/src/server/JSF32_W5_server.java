@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 
 /**
@@ -43,8 +44,20 @@ public class JSF32_W5_server {
             int id = 1;
             while(true) {
                 Socket clientSocket = ss.accept();
-                pool.execute(new ServerSession(clientSocket, id));
-                id++;
+                
+                
+                ServerSession serverSession = new ServerSession(clientSocket, id);
+                
+                pool.execute(serverSession);
+                
+//                Platform.runLater(new Runnable() {
+//
+//                    @Override
+//                    public void run() {
+//                        serverSession.run();
+//                    }
+//                } );
+//                id++;
             }
         } catch (IOException ex) {
             Logger.getLogger(JSF32_W5_server.class.getName()).log(Level.SEVERE, null, ex);

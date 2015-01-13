@@ -74,7 +74,7 @@ public class ClientSession {
             System.out.println("[A]ll Edges or [S]ingle Edge? ");
             readWriteString = scanner.nextLine();
             
-            if (readWriteString.trim().toLowerCase() == "a")
+            if (readWriteString.trim().toLowerCase().equals("a"))
             {
                 allEdges = true;
             }
@@ -92,7 +92,7 @@ public class ClientSession {
             if (allEdges)
             {
                 edges = (List<Edge>) in.readObject();
-                System.out.println("Edges received");
+                System.out.println("All Edges received");
                 
                 for(Edge e : edges) {
                 app.drawEdge(e);
