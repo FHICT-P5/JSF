@@ -33,9 +33,41 @@ public class Edge implements Serializable {
         this.color = Color.valueOf(colorString);
     }
     
+    public double getColorValue()
+    {
+        if (color == null)
+        {
+            return Color.WHITE.getHue();
+        }
+        else
+        {
+            return color.getHue();
+        }
+    }
+    
+    public Color getColor()
+    {
+        return color;
+    }
+    
     @Override
     public String toString()
     {
-        return X1 + "_" + Y1 + "_" + X2 + "_" + Y2 + "_" + colorString;
+        char colorChar;
+        
+        if (this.color == Color.RED)
+        {
+            colorChar = 0;
+        }
+        else if (this.color == Color.BLUE)
+        {
+            colorChar = 1;
+        }
+        else
+        {
+            colorChar = 2;
+        }
+        
+        return X1 + "_" + Y1 + "_" + X2 + "_" + Y2 + "_" + colorChar;
     }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Scanner;
+import javafx.application.Platform;
 import jsf32_w4.JSF32_W4;
 
 /**
@@ -126,19 +127,24 @@ public class KochManager implements Observer {
             kochFractal.generateRightEdge();
         }
         
+        
+        
         for (int i = 0; i < writerCount; i++)
         {
             KochWriter writer = new KochWriter(this, path, level, useBuffer, edges);
             System.out.println("Running writer " + i);
-            writer.run();
-            
+            //Platform.runLater(writer);
+            Thread thread = new Thread(writer);
+            thread.start();
         }
         
         for (int i = 0; i < readerCount; i++)
         {
             KochReader reader = new KochReader(this, path, level, useBuffer);
             System.out.println("Running reader " + i);
-            reader.run();
+            //Platform.runLater(reader);
+            Thread thread = new Thread(reader);
+            thread.start();
         }
     }
     
